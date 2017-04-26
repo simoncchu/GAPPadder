@@ -4,12 +4,12 @@
     },
     "raw_reads": [
 		    {
-		        "left": "left.fastq",
-		        "right": "right.fastq"
+		        "left": "/gpfs/scratchfs1/chc12015/GAPdenovo/chrom14/long_insert_30k/longjump_1.fastq",
+		        "right": "/gpfs/scratchfs1/chc12015/GAPdenovo/chrom14/long_insert_30k/longjump_2.fastq"
 		    },
 		    {
-            "left": "left1.fastq",
-		        "right": "right1.fastq"
+            "left": "/gpfs/scratchfs1/chc12015/GAPdenovo/chrom14/short_insert/frag_1.fastq",
+		        "right": "/gpfs/scratchfs1/chc12015/GAPdenovo/chrom14/short_insert/frag_1.fastq"
         }
 	  ],
     "alignments": [
@@ -25,15 +25,15 @@
         }
 	  ],
     "software_path": {
-        "bwa": "GLOBAL",
-        "samtools": "GLOBAL",
+        "bwa": "bwa",
+        "samtools": "samtools",
         "velvet": "/gpfs/scratchfs1/chc12015/tools/velvet-master/",
         "kmc": "/gpfs/scratchfs1/chc12015/tools/kmc2.3/",
         "TERefiner": "./TERefiner_1",
         "ContigsMerger": "./ContigsMerger"
     },
     "parameters": {
-    		"working_folder": "/gpfs/scratchfs1/chc12015/GAPdenovo/test/",
+    		"working_folder": "/gpfs/scratchfs1/chc12015/GAPdenovo/test/chrm14_test/",
         "min_gap_size": "100",
         "flank_length": "300",
         "nthreads": "15",

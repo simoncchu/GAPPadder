@@ -45,21 +45,29 @@ def parse_configuration(sf_config):
     lalgnmt=[]
     lkmers=[]
     lraw_reads=[]
+    rtn_msg=""
+    rtn_value=False
+
     with open(sf_config) as data_file:
         data = json.load(data_file)
 
         ##first check whether required settings are set
-        if "draft_genome"not in data or "alignments" not in data:
+        if ("draft_genome"not in data) or ("alignments" not in data) or ("raw_reads" not in data):
             return False
         ##required settings
         #input draft genome
         sf_draft=data["draft_genome"]["fa"]
+        if os.path.exists(sf_draft)==False:
+            rtn_msg="The provided draft genome does not exist, please check!!!"
+            return rtn_msg, rtn_value
         ##alignment list
         for record in data["alignments"]:
             bam=record["bam"]
             insert_size=record["is"]
             std_derivation=record["std"]
             lalgnmt.append((bam,insert_size,std_derivation))
+            rtn_msg="The bam file "+bam+" doesn't exist, please check!!!"
+            return rtn_msg, rtn_value
 
         ##optinal settings
         #parameters

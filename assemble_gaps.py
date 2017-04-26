@@ -53,6 +53,31 @@ def run_clear(id):
         cmd="rm {0}kmers/{0}_*".format(working_folder,id)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
 
+def cvtFaToFq(sf_fa, sf_fq):
+    cnt=0
+    index=0
+    fin=open(sf_fa, 'rt')
+    fout=open(sf_fq, 'wt')
+    for stemp in fin:
+        if stemp[0]=='>':
+            cnt=int(stemp[1:])
+        else:
+            read_name="@{0}\n".format(index)
+            index+=1
+            fout.write(read_name)
+            fout.write(stemp)
+            fout.write("+\n")
+            seq_len=len(stemp)
+            iss=1
+            quality=""
+            while iss<seq_len:
+                quality+="5"
+                iss+=1
+            quality+="\n"
+            fout.write(quality)
+    fout.close()
+    fin.close()
+
 def run_assembly(id):
     global kmer_len_list
     global working_folder
@@ -76,9 +101,9 @@ def run_assembly(id):
             .format(kmc_path, working_folder, id, working_folder,id)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-        cmd="awk -f {0}../cvtKMC_2_Fq.awk {1}temp/{2}.dump > {3}kmers/{4}_kmers.fq"\
-            .format(working_folder,working_folder,id,working_folder,id)
-        Popen(cmd, shell = True, stdout = PIPE).communicate()
+        sf_fa="{0}temp/{1}.dump".format(working_folder,id)
+        sf_fq="{0}kmers/{1}_kmers.fq".format(working_folder,id)
+        cvtFaToFq(sf_fa, sf_fq)
 
         pth=working_folder+"velvet_temp/{0}".format(id)
         if os.path.exists(pth)==False:
