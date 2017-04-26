@@ -6,6 +6,8 @@ from multiprocessing.dummy import Pool as ThreadPool
 from MergeContigs import *
 from Bio import SeqIO
 from Utility import *
+from pick_contigs import ContigsSelection
+from collect_both_unmapped_reads import BothUnmappedReadsCollector
 
 kmer_len_list=[]
 working_folder=""
@@ -13,6 +15,43 @@ kmc_path=""
 velvet_path=""
 bwa_path=""
 samtools_path=""
+
+def run_clear(id):
+    global working_folder
+    sf_ori_contig=working_folder+"velvet_temp/{0}/original_contigs_before_merging.fa".format(id)
+    if os.path.exists(sf_ori_contig):
+        print id
+
+    sf_contig0=working_folder+"velvet_temp/{0}/contigs.fa".format(id)
+    sf_contig1=working_folder+"velvet_temp/{0}/contigs_31_29.fa".format(id)
+    sf_contig2=working_folder+"velvet_temp/{0}/contigs_41_37.fa".format(id)
+    sf_contig3=working_folder+"velvet_temp/{0}/contigs_41_39.fa".format(id)
+    sf_contig5=working_folder+"velvet_temp/{0}/contigs_51_47.fa".format(id)
+    sf_contig6=working_folder+"velvet_temp/{0}/contigs_61_57.fa".format(id)
+    sf_seq=working_folder+"velvet_temp/{0}/Sequences".format(id)
+    if os.path.exists(sf_contig0) and os.path.exists(sf_contig1) and os.path.exists(sf_contig2) \
+            and os.path.exists(sf_contig3) and os.path.exists(sf_contig5) and os.path.exists(sf_contig6)\
+            and os.path.exists(sf_seq):
+        cmd="rm {0}temp/{1}.*".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
+
+        cmd="rm {0}velvet_temp/{1}/Sequences".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
+        cmd="rm {0}velvet_temp/{1}/Roadmaps".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
+        cmd="rm {0}velvet_temp/{1}/PreGraph".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
+        cmd="rm {0}velvet_temp/{1}/Graph".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
+        cmd="rm {0}velvet_temp/{1}/LastGraph".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
+        cmd="rm {0}velvet_temp/{1}/Log".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
+        cmd="rm {0}velvet_temp/{1}/stats.txt".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
+
+        cmd="rm {0}kmers/{0}_*".format(working_folder,id)
+        Popen(cmd, shell = True, stdout = PIPE).communicate()
 
 def run_assembly(id):
     global kmer_len_list
@@ -68,8 +107,7 @@ def run_assembly(id):
                         fout_merged.write(">"+klen+"_"+line[1:])
                     else:
                         fout_merged.write(line)
-    self.run_clear(id)
-
+    run_clear(id)
 
 def run_merge(sf_contig):
     global working_folder
@@ -79,7 +117,6 @@ def run_merge(sf_contig):
     if os.path.exists(sf_contig)==False:
         return
     merge_contigs(sf_folder, 5, 0.99, 0.99)
-
 
 def is_qualified_clipped(cigar, cutoff_len):
     l=len(cigar)
@@ -176,43 +213,7 @@ class GapAssembler():
         self.bunch_size=1
         self.refiner_path=get_refiner_path()
         self.merger_path=get_merger_path()
-        
-    def run_clear(self, id):
-        global working_folder
-        sf_ori_contig=working_folder+"velvet_temp/{0}/original_contigs_before_merging.fa".format(id)
-        if os.path.exists(sf_ori_contig):
-            print id
 
-        sf_contig0=working_folder+"velvet_temp/{0}/contigs.fa".format(id)
-        sf_contig1=working_folder+"velvet_temp/{0}/contigs_31_29.fa".format(id)
-        sf_contig2=working_folder+"velvet_temp/{0}/contigs_41_37.fa".format(id)
-        sf_contig3=working_folder+"velvet_temp/{0}/contigs_41_39.fa".format(id)
-        sf_contig5=working_folder+"velvet_temp/{0}/contigs_51_47.fa".format(id)
-        sf_contig6=working_folder+"velvet_temp/{0}/contigs_61_57.fa".format(id)
-        sf_seq=working_folder+"velvet_temp/{0}/Sequences".format(id)
-        if os.path.exists(sf_contig0) and os.path.exists(sf_contig1) and os.path.exists(sf_contig2) \
-                and os.path.exists(sf_contig3) and os.path.exists(sf_contig5) and os.path.exists(sf_contig6)\
-                and os.path.exists(sf_seq):
-            cmd="rm {0}temp/{1}.*".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
-
-            cmd="rm {0}velvet_temp/{1}/Sequences".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
-            cmd="rm {0}velvet_temp/{1}/Roadmaps".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
-            cmd="rm {0}velvet_temp/{1}/PreGraph".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
-            cmd="rm {0}velvet_temp/{1}/Graph".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
-            cmd="rm {0}velvet_temp/{1}/LastGraph".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
-            cmd="rm {0}velvet_temp/{1}/Log".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
-            cmd="rm {0}velvet_temp/{1}/stats.txt".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
-
-            cmd="rm {0}kmers/{0}_*".format(working_folder,id)
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
 
     def prepare_list(self):
         global working_folder
@@ -247,7 +248,7 @@ class GapAssembler():
                     fa_list.append(sf_fa)
         return fa_list
 
-    def assembly(self, id_list, n):
+    def assembly(self, id_list):
         global working_folder
         if os.path.exists(working_folder+"empty_dir")==False:
             cmd="mkdir {0}empty_dir".format(working_folder)
@@ -266,30 +267,78 @@ class GapAssembler():
         cmd="rsync -a --delete {0}empty_dir/ {1}velvet_temp/".format(working_folder,working_folder)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-        pool = Pool(n)
+        pool = Pool(self.n_jobs)
         pool.map(run_assembly, id_list, self.bunch_size)
         pool.close()
         pool.join()
 
-    def run_contigs_merge(self, n, fa_list):
+    def run_contigs_merge(self, fa_list):
         print "Start merging..."
-        pool=Pool(n)
+        pool=Pool(self.n_jobs)
         pool.map(run_merge, fa_list, self.bunch_size)
         pool.close()
         pool.join()
 
-    def assembly_given_list(self, id_list, n):
-        pool = Pool(n)
+    def assembly_given_list(self, id_list):
+        pool = Pool(self.n_jobs)
         pool.map(run_assembly, id_list, self.bunch_size)
         pool.close()
         pool.join()
 
-    def collect_high_quality_unmap_to_contigs_reads(self, n, id_list):
-        pool = Pool(n)
+    def collect_high_quality_unmap_to_contigs_reads(self, id_list):
+        pool = Pool(self.n_jobs)
         pool.map(run_collect_high_quality_unmap_to_contig_reads, id_list, self.bunch_size)
         pool.close()
         pool.join()
 
+    def pick_already_constructed(self, contigs_select, bwa_min_score, fa_list, sf_picked):
+        contigs_select.pick_full_constructed_contigs(bwa_min_score, fa_list, sf_picked)
+        m_picked=contigs_select.get_already_picked(sf_picked)
+
+        id_remain=[]
+        for key in fa_list:#
+            if m_picked.has_key(key)==False:
+                id_remain.append(key)
+        return id_remain
+
+    def assemble_pipeline(self):
+        global working_folder
+        fa_list=self.prepare_list()
+        print "First round assembly and merger..."
+        self.assembly(fa_list)
+        self.run_contigs_merge(fa_list)
+
+        sf_picked=working_folder+"picked_seqs.fa"
+        bwa_min_score=30
+        contigs_select=ContigsSelection(working_folder)
+
+        id_remain=self.pick_already_constructed(contigs_select, bwa_min_score, fa_list, sf_picked)
+        algnmt_list=get_alignment_list()
+        bam_list=[]
+        for algnmt in algnmt_list:
+            bam_list.append(algnmt[0])
+
+        print "Collect both unmapped reads..."
+        burc=BothUnmappedReadsCollector(working_folder)
+        burc.collect_both_unmapped_reads(bam_list, id_remain)
+
+        print "Second round assembly..."
+        self.assembly_given_list(id_remain)
+        id_remain2=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain, sf_picked)
+
+        print "Second round merging..."
+        self.run_contigs_merge(id_remain2)
+        id_remain3=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain2, sf_picked)
+
+        print "Collecting high quality reads to improve the merging step..."
+        self.collect_high_quality_unmap_to_contigs_reads(id_remain3)
+        self.run_contigs_merge(id_remain3)
+
+        # # # # # #
+        print "Pick extended gap sequences..."
+        bwa_min_score=15
+        id_remain4=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain3, sf_picked)
+        contigs_select.pick_extended_contigs(bwa_min_score, id_remain4, sf_picked)
 
 # def run_filter(id):
 #     fcontig="velvet_temp/"+id+"/contigs.fa"
@@ -326,68 +375,3 @@ class GapAssembler():
 #     pool1.map(run_filter, fa_list,self.bunch_size)
 #     pool1.close()
 #     pool1.join()
-
-
-if __name__ == "__main__":
-    fa_list=prepare_list(sf_fai, sf_pos)
-    bwa_min_score=30
-    ##
-    print "First round assembly and merger..."
-    assembly(fa_list, n_jobs)
-    run_contigs_merge(n_jobs, fa_list)
-    ##
-    sf_picked="picked_seqs.fa" #################problem here, should add the working folder
-    bwa_min_score=30######################################################################################
-
-    #print fa_list
-    pick_full_constructed_contigs(bwa_min_score, n_jobs, fa_list, sf_picked)
-    m_picked=get_already_picked(sf_picked)
-
-    id_remain=[]
-    for key in fa_list:#
-        if m_picked.has_key(key)==False:
-            id_remain.append(key)
-
-    algnmt_list=get_alignment_list()
-    bam_list=[]
-    for algnmt in algnmt_list:
-        bam_list.append(algnmt[0])
-
-    print "Collect both unmapped reads..."
-    collect_both_unmapped_reads(bam_list, id_remain, n_jobs)
-    #print "Second round assembly..."
-    #assembly_given_list(id_remain,n_jobs)
-    #
-    #pick_full_constructed_contigs(bwa_min_score, n_jobs, id_remain, sf_picked)
-    #m_picked=get_already_picked(sf_picked)
-    # #
-    # del id_remain[:]
-    # for key in fa_list:
-    #     if m_picked.has_key(key)==False:
-    #         id_remain.append(key)
-    # #
-    # print "Second round merging..."
-    # run_contigs_merge(n_jobs, id_remain)
-    #
-    # ##
-    pick_full_constructed_contigs(bwa_min_score, n_jobs, id_remain, sf_picked)
-    m_picked=get_already_picked(sf_picked)
-    # #
-    del id_remain[:]
-    for key in fa_list:
-        if m_picked.has_key(key)==False:
-            id_remain.append(key)
-    # #
-    collect_high_quality_unmap_to_contigs_reads(n_jobs, id_remain)
-    run_contigs_merge(n_jobs, id_remain)
-    # # #
-    # # # # # #
-    bwa_min_score=15
-    pick_full_constructed_contigs(bwa_min_score, n_jobs, id_remain, sf_picked)
-    # #
-    m_picked=get_already_picked(sf_picked)
-    id_remain=[]
-    for key in fa_list:
-        if m_picked.has_key(key)==False:
-            id_remain.append(key)
-    pick_extended_contigs(n_jobs, id_remain, sf_picked)

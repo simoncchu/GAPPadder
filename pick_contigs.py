@@ -3,16 +3,18 @@ import os
 from subprocess import *
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
-from MergeContigs import *
 from Bio import SeqIO
 from Utility import *
 
-self.BOTH_CLIP=1
-self.LEFT_CLIP=2
-self.RIGTH_CLIP=3
-self.UNCLIP=4
-self.m_flanks={}
-self.bwa_min_score=30
+BOTH_CLIP=1
+LEFT_CLIP=2
+RIGTH_CLIP=3
+UNCLIP=4
+m_flanks={}
+bwa_min_score=30
+working_folder=""
+bwa_path=""
+samtools_path=""
 
 def gnrt_reverse_complementary(s):
     lth=len(s)
@@ -31,6 +33,10 @@ def gnrt_reverse_complementary(s):
     return s_rc
 
 def get_clip_type_length(cigar):
+    global LEFT_CLIP
+    global RIGTH_CLIP
+    global UNCLIP
+    global BOTH_CLIP
     l=len(cigar)
     signal=[]
     lenth=[]
@@ -46,37 +52,44 @@ def get_clip_type_length(cigar):
             lenth.append(int(temp))
             temp=""
 
-    clip_type=self.UNCLIP
+    clip_type=UNCLIP
     if (signal[0]=="S" or signal[0]=="H") and (signal[len(signal)-1]=="S" or signal[len(signal)-1]=="H"):
-        clip_type=self.BOTH_CLIP
+        clip_type=BOTH_CLIP
     elif signal[0]=="S" or signal[0]=="H":
-        clip_type=self.LEFT_CLIP
+        clip_type=LEFT_CLIP
     elif signal[len(signal)-1]=="S" or signal[len(signal)-1]=="H":
-        clip_type=self.RIGTH_CLIP
-
+        clip_type=RIGTH_CLIP
     return clip_type, total_M
 
 def run_pick_full_constructed_contig(id):
-    sf_flank=self.working_folder+"../flank_regions/{0}.fa".format(id)
-    #if self.m_flanks.has_key(id)==False or len(self.m_flanks[id])!=2:
+    global working_folder
+    global LEFT_CLIP
+    global RIGTH_CLIP
+    global UNCLIP
+    global BOTH_CLIP
+    global bwa_path
+    global samtools_path
+    global bwa_min_score
+
+    sf_flank=working_folder+"../flank_regions/{0}.fa".format(id)
     if os.path.exists(sf_flank)==False:
         print "Wrong flank regions: ", id
         return
 
-    sf_contig=self.working_folder+"velvet_temp/{0}/contigs.fa".format(id)
-    cmd="{0} index {1}".format(self.bwa_path, sf_contig)
+    sf_contig=working_folder+"velvet_temp/{0}/contigs.fa".format(id)
+    cmd="{0} index {1}".format(bwa_path, sf_contig)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-    sf_flank_alnmt=self.working_folder+"velvet_temp/{0}/flanks.sam".format(id)
+    sf_flank_alnmt=working_folder+"velvet_temp/{0}/flanks.sam".format(id)
     cmd="{0} mem -T {1} -a {2} {3} | {4} view -S - > {5}"\
-        .format(self.bwa_path, self.bwa_min_score, sf_contig, sf_flank, self.samtools_path, sf_flank_alnmt)
+        .format(bwa_path, bwa_min_score, sf_contig, sf_flank, samtools_path, sf_flank_alnmt)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-    sf_pk=self.working_folder+"velvet_temp/{0}/picked_seqs.fa".format(id)
+    sf_pk=working_folder+"velvet_temp/{0}/picked_seqs.fa".format(id)
     if os.path.exists(sf_pk):
         cmd="rm {0}".format(sf_pk)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
-    sf_pk=self.working_folder+"velvet_temp/{0}/picked_contigs.fa".format(id)
+    sf_pk=working_folder+"velvet_temp/{0}/picked_contigs.fa".format(id)
     if os.path.exists(sf_pk):
         cmd="rm {0}".format(sf_pk)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
@@ -92,7 +105,7 @@ def run_pick_full_constructed_contig(id):
                 continue
             clip_type, map_length=get_clip_type_length(cigar)
 
-            if clip_type==self.BOTH_CLIP:
+            if clip_type==BOTH_CLIP:
                 continue
 
             map_pos=int(fields[3])
@@ -136,12 +149,12 @@ def run_pick_full_constructed_contig(id):
     #print m_hit_id
     for rname in m_hit_id:
         if len(m_hit_id[rname])==2:
-            b_l_u=m_hit_id[rname]["left"].has_key(self.UNCLIP)
-            b_l_l=m_hit_id[rname]["left"].has_key(self.LEFT_CLIP)
-            b_l_r=m_hit_id[rname]["left"].has_key(self.RIGTH_CLIP)
-            b_r_u=m_hit_id[rname]["right"].has_key(self.UNCLIP)
-            b_r_l=m_hit_id[rname]["right"].has_key(self.LEFT_CLIP)
-            b_r_r=m_hit_id[rname]["right"].has_key(self.RIGTH_CLIP)
+            b_l_u=m_hit_id[rname]["left"].has_key(UNCLIP)
+            b_l_l=m_hit_id[rname]["left"].has_key(LEFT_CLIP)
+            b_l_r=m_hit_id[rname]["left"].has_key(RIGTH_CLIP)
+            b_r_u=m_hit_id[rname]["right"].has_key(UNCLIP)
+            b_r_l=m_hit_id[rname]["right"].has_key(LEFT_CLIP)
+            b_r_r=m_hit_id[rname]["right"].has_key(RIGTH_CLIP)
 
             left_clip_type=-2
             right_clip_type=-2
@@ -156,8 +169,8 @@ def run_pick_full_constructed_contig(id):
             b_rc=False
 
             if b_l_u and b_r_u:
-                left_clip_type=self.UNCLIP
-                right_clip_type=self.UNCLIP
+                left_clip_type=UNCLIP
+                right_clip_type=UNCLIP
                 left_flag=m_hit_id[rname]["left"][left_clip_type][0]
                 right_flag=m_hit_id[rname]["right"][right_clip_type][0]
                 match_length=m_hit_id[rname]["left"][left_clip_type][1]+m_hit_id[rname]["right"][right_clip_type][1]
@@ -172,8 +185,8 @@ def run_pick_full_constructed_contig(id):
                     if left_flag & 16 != 0:
                         b_rc=True
             if b_l_u and b_r_l:
-                left_clip_type=self.UNCLIP
-                right_clip_type=self.LEFT_CLIP
+                left_clip_type=UNCLIP
+                right_clip_type=LEFT_CLIP
                 left_flag=m_hit_id[rname]["left"][left_clip_type][0]
                 right_flag=m_hit_id[rname]["right"][right_clip_type][0]
                 match_length=m_hit_id[rname]["left"][left_clip_type][1]+m_hit_id[rname]["right"][right_clip_type][1]
@@ -188,8 +201,8 @@ def run_pick_full_constructed_contig(id):
                     if left_flag & 16 != 0:
                         b_rc=True
             if b_l_u and b_r_r:
-                left_clip_type=self.UNCLIP
-                right_clip_type=self.RIGTH_CLIP
+                left_clip_type=UNCLIP
+                right_clip_type=RIGTH_CLIP
                 left_flag=m_hit_id[rname]["left"][left_clip_type][0]
                 right_flag=m_hit_id[rname]["right"][right_clip_type][0]
                 match_length=m_hit_id[rname]["left"][left_clip_type][1]+m_hit_id[rname]["right"][right_clip_type][1]
@@ -204,8 +217,8 @@ def run_pick_full_constructed_contig(id):
                     if left_flag & 16 != 0:
                         b_rc=True
             if b_l_l and b_r_u:
-                left_clip_type=self.LEFT_CLIP
-                right_clip_type=self.UNCLIP
+                left_clip_type=LEFT_CLIP
+                right_clip_type=UNCLIP
                 left_flag=m_hit_id[rname]["left"][left_clip_type][0]
                 right_flag=m_hit_id[rname]["right"][right_clip_type][0]
                 match_length=m_hit_id[rname]["left"][left_clip_type][1]+m_hit_id[rname]["right"][right_clip_type][1]
@@ -220,8 +233,8 @@ def run_pick_full_constructed_contig(id):
                     if left_flag & 16 != 0:
                         b_rc=True
             if b_l_l and b_r_r:
-                left_clip_type=self.LEFT_CLIP
-                right_clip_type=self.RIGTH_CLIP
+                left_clip_type=LEFT_CLIP
+                right_clip_type=RIGTH_CLIP
                 left_flag=m_hit_id[rname]["left"][left_clip_type][0]
                 right_flag=m_hit_id[rname]["right"][right_clip_type][0]
                 match_length=m_hit_id[rname]["left"][left_clip_type][1]+m_hit_id[rname]["right"][right_clip_type][1]
@@ -236,8 +249,8 @@ def run_pick_full_constructed_contig(id):
                     if left_flag & 16 != 0:
                         b_rc=True
             if b_l_r and b_r_u:
-                left_clip_type=self.RIGTH_CLIP
-                right_clip_type=self.UNCLIP
+                left_clip_type=RIGTH_CLIP
+                right_clip_type=UNCLIP
                 left_flag=m_hit_id[rname]["left"][left_clip_type][0]
                 right_flag=m_hit_id[rname]["right"][right_clip_type][0]
                 match_length=m_hit_id[rname]["left"][left_clip_type][1]+m_hit_id[rname]["right"][right_clip_type][1]
@@ -252,8 +265,8 @@ def run_pick_full_constructed_contig(id):
                     if left_flag & 16 != 0:
                         b_rc=True
             if b_l_r and b_r_l:
-                left_clip_type=self.RIGTH_CLIP
-                right_clip_type=self.LEFT_CLIP
+                left_clip_type=RIGTH_CLIP
+                right_clip_type=LEFT_CLIP
                 left_flag=m_hit_id[rname]["left"][left_clip_type][0]
                 right_flag=m_hit_id[rname]["right"][right_clip_type][0]
                 match_length=m_hit_id[rname]["left"][left_clip_type][1]+m_hit_id[rname]["right"][right_clip_type][1]
@@ -307,7 +320,6 @@ def run_pick_full_constructed_contig(id):
             s_picked=key
             min_lenth=end_pos-start_pos
 
-
     if s_picked!="": #if find one
         if m_picked_id.has_key(s_picked)==False:
             return
@@ -317,8 +329,8 @@ def run_pick_full_constructed_contig(id):
         right_map_length=m_picked_id[s_picked][3]
         b_rc=m_picked_id[s_picked][4]
 
-        sf_picked=self.working_folder+"velvet_temp/{0}/picked_seqs.fa".format(id)
-        sf_picked_contigs=self.working_folder+"velvet_temp/{0}/picked_contigs.fa".format(id)
+        sf_picked=working_folder+"velvet_temp/{0}/picked_seqs.fa".format(id)
+        sf_picked_contigs=working_folder+"velvet_temp/{0}/picked_contigs.fa".format(id)
         f_picked_contigs=open(sf_picked_contigs,"w")
         with open(sf_picked,"w") as fout_picked:
             for record in SeqIO.parse(sf_contig, "fasta"):
@@ -346,47 +358,23 @@ def run_pick_full_constructed_contig(id):
         f_picked_contigs.close()
 
 
-    def pick_full_constructed_contigs(self, bwa_min_score, n, fa_list, sf_picked):
-        self.bwa_min_score=bwa_min_score
-        pool = Pool(n)
-        pool.map(self.run_pick_full_constructed_contig, fa_list, self.bunch_size)
-        pool.close()
-        pool.join()
-
-        #with open("picked_seqs_round0.fa","a") as fout_seqs:
-        #print fa_list ##########################################################################################################
-        for key in fa_list:
-            sf_tmp=self.working_folder+"velvet_temp/{0}/picked_seqs.fa".format(key)
-            if os.path.exists(sf_tmp)==True:
-                cmd="cat {0} >> {1}".format(sf_tmp, sf_picked)
-                Popen(cmd, shell = True, stdout = PIPE).communicate()
-            sf_tmp=self.working_folder+"velvet_temp/{0}/picked_contigs.fa".format(key)
-            if os.path.exists(sf_tmp)==True:
-                cmd="cat {0} >> {1}".format(sf_tmp, sf_picked+"_ori.txt")
-                Popen(cmd, shell = True, stdout = PIPE).communicate()
-
-    def get_already_picked(self, sf_picked):
-        l_picked={}
-        with open(sf_picked) as fin_picked:
-            for line in fin_picked:
-                if line[0]==">":
-                    fields=line[1:].split("_")
-                    l_picked[fields[0]+"_"+fields[1]]=1
-        return l_picked
-
-
 def run_pick_extended_contig(id):
     #print id ##########################################################################################################################3
-    sf_contig="velvet_temp/{0}/contigs.fa".format(id)
+    global working_folder
+    global LEFT_CLIP
+    global RIGTH_CLIP
+    global UNCLIP
+    global BOTH_CLIP
+
+    sf_contig=working_folder+"velvet_temp/{0}/contigs.fa".format(id)
     if os.path.exists(sf_contig)==False:
         return
     m_contigs={}
     for record in SeqIO.parse(sf_contig, "fasta"):
         m_contigs[str(record.id)]=str(record.seq)
 
-    sf_flank_alnmt="velvet_temp/{0}/flanks.sam".format(id)
+    sf_flank_alnmt=working_folder+"velvet_temp/{0}/flanks.sam".format(id)
     m_hit_id={}
-    m_picked_id={}
     with open(sf_flank_alnmt) as fin_algnmt:
         for line in fin_algnmt:
             fields=line.split()
@@ -399,7 +387,7 @@ def run_pick_extended_contig(id):
                 b_rc=True
 
             clip_type, map_length=get_clip_type_length(cigar)
-            if clip_type==self.UNCLIP or clip_type==self.BOTH_CLIP:
+            if clip_type==UNCLIP or clip_type==BOTH_CLIP:
                 continue
 
             map_pos=int(fields[3])
@@ -408,7 +396,7 @@ def run_pick_extended_contig(id):
 
             qname_field=qname.split("_")
             if qname_field[-1]=="left":
-                if (b_rc==True and clip_type==self.LEFT_CLIP) or (b_rc==False and clip_type==self.RIGTH_CLIP):
+                if (b_rc==True and clip_type==LEFT_CLIP) or (b_rc==False and clip_type==RIGTH_CLIP):
                     continue
                 if m_hit_id.has_key(qname)==False:
                     m_hit_id[qname]={}
@@ -423,7 +411,7 @@ def run_pick_extended_contig(id):
                         m_hit_id[qname]["left"][rname]=(map_pos, map_length, b_rc)
 
             elif qname_field[-1]=="right":
-                if (b_rc==True and clip_type==self.RIGTH_CLIP) or (b_rc==False and clip_type==self.LEFT_CLIP):
+                if (b_rc==True and clip_type==RIGTH_CLIP) or (b_rc==False and clip_type==LEFT_CLIP):
                     continue
 
                 if m_hit_id.has_key(qname)==False:
@@ -480,13 +468,6 @@ def run_pick_extended_contig(id):
 
     s_contig=""
     if s_left_picked!="" and s_left_picked==s_right_picked:
-
-        # if m_hit_id.has_key(id+"_left")==False or m_hit_id.has_key(id+"_right")==False:
-        #     return
-        # if m_hit_id[id+"_left"]["left"].has_key(s_left_picked)==False \
-        #         or m_hit_id[id+"_right"]["right"].has_key(s_right_picked)==False:
-        #     return
-
         l_map_length=m_hit_id[id+"_left"]["left"][s_left_picked][1]
         b_rc_left=m_hit_id[id+"_left"]["left"][s_left_picked][2]
         b_rc_right=m_hit_id[id+"_right"]["right"][s_right_picked][2]
@@ -511,12 +492,6 @@ def run_pick_extended_contig(id):
                 s_right_seq=m_contigs[s_right_picked][map_pos+r_map_length-1:]
             s_contig=m_contigs[s_right_picked]
     else:
-        # if m_hit_id.has_key(id+"_left")==False or m_hit_id.has_key(id+"_right")==False:
-        #     return
-        # if m_hit_id[id+"_left"]["left"].has_key(s_left_picked)==False \
-        #         or m_hit_id[id+"_right"]["right"].has_key(s_right_picked)==False:
-        #     return
-
         if s_left_picked!="":
             if m_contigs.has_key(s_left_picked)==False:
                 return
@@ -541,8 +516,6 @@ def run_pick_extended_contig(id):
                 s_right_seq=m_contigs[s_right_picked][map_pos+map_length-1:]
             s_contig=s_contig+"NN"+m_contigs[s_right_picked]
 
-    #print "33333333333333333333333" #################################################################################3
-
     s_seq=""
     if b_rc_left==False and b_rc_right==False:
         s_seq=s_left_seq+"NN"+s_right_seq
@@ -553,35 +526,79 @@ def run_pick_extended_contig(id):
     elif b_rc_left==True and b_rc_right==False:
         s_seq=gnrt_reverse_complementary(s_left_seq)+"NN"+s_right_seq
 
-
     if s_seq!="" and s_seq!="NN":
-        sf_picked="velvet_temp/{0}/picked_seqs.fa".format(id)
+        sf_picked=working_folder+"velvet_temp/{0}/picked_seqs.fa".format(id)
         with open(sf_picked,"w") as fout_picked:
             fout_picked.write(">"+id+"_"+s_left_picked+"_"+s_right_picked+"_extended"+"\n")
             fout_picked.write(s_seq+"\n")
 
     if s_contig!="" and s_contig!="NN":
-        sf_contig="velvet_temp/{0}/picked_contigs.fa".format(id)
+        sf_contig=working_folder+"velvet_temp/{0}/picked_contigs.fa".format(id)
         with open(sf_contig,"w") as fout_picked:
             fout_picked.write(">"+id+"_"+s_left_picked+"_"+s_right_picked+"_extended"+"\n")
             fout_picked.write(s_contig+"\n")
 
 
-def pick_extended_contigs(n, fa_list, sf_picked):
-    pool = Pool(n)
-    pool.map(run_pick_extended_contig, fa_list, self.bunch_size)
-    pool.close()
-    pool.join()
+class ContigsSelection():
+    def __init__(self, working_space):
+        global working_folder
+        global bwa_path
+        global samtools_path
+        working_folder=working_space
+        bwa_path=get_bwa_path()
+        samtools_path=get_samtools_path()
+        self.nthreads=get_threads_num()
 
-    for key in fa_list:
-        sf_tmp="velvet_temp/{0}/picked_seqs.fa".format(key)
-        if os.path.exists(sf_tmp)==True:
-            cmd="cat {0} >> {1}".format(sf_tmp, sf_picked)
-            print cmd
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-        sf_tmp="velvet_temp/{0}/picked_contigs.fa".format(key)
-        if os.path.exists(sf_tmp)==True:
-            cmd="cat {0} >> {1}".format(sf_tmp, sf_picked+"_ori.txt")
-            print cmd
-            Popen(cmd, shell = True, stdout = PIPE).communicate()
+    def pick_full_constructed_contigs(self, bwa_score, fa_list, sf_picked):
+        global working_folder
+        global bwa_min_score
+        bwa_min_score=bwa_score
+        pool = Pool(self.nthreads)
+        pool.map(run_pick_full_constructed_contig, fa_list, 1)
+        pool.close()
+        pool.join()
+
+        #with open("picked_seqs_round0.fa","a") as fout_seqs:
+        #print fa_list ##########################################################################################################
+        for key in fa_list:
+            sf_tmp=working_folder+"velvet_temp/{0}/picked_seqs.fa".format(key)
+            if os.path.exists(sf_tmp)==True:
+                cmd="cat {0} >> {1}".format(sf_tmp, sf_picked)
+                Popen(cmd, shell = True, stdout = PIPE).communicate()
+            sf_tmp=working_folder+"velvet_temp/{0}/picked_contigs.fa".format(key)
+            if os.path.exists(sf_tmp)==True:
+                cmd="cat {0} >> {1}".format(sf_tmp, sf_picked+"_ori.txt")
+                Popen(cmd, shell = True, stdout = PIPE).communicate()
+
+    def get_already_picked(self, sf_picked):
+        l_picked={}
+        with open(sf_picked) as fin_picked:
+            for line in fin_picked:
+                if line[0]==">":
+                    fields=line[1:].split("_")
+                    l_picked[fields[0]+"_"+fields[1]]=1
+        return l_picked
+
+
+    def pick_extended_contigs(self, bwa_score, fa_list, sf_picked):
+        global working_folder
+        global bwa_min_score
+        bwa_min_score=bwa_score
+        pool = Pool(self.nthreads)
+        pool.map(run_pick_extended_contig, fa_list, 1)
+        pool.close()
+        pool.join()
+
+        for key in fa_list:
+            sf_tmp=working_folder+"velvet_temp/{0}/picked_seqs.fa".format(key)
+            if os.path.exists(sf_tmp)==True:
+                cmd="cat {0} >> {1}".format(sf_tmp, sf_picked)
+                print cmd
+                Popen(cmd, shell = True, stdout = PIPE).communicate()
+
+            sf_tmp=working_folder+"velvet_temp/{0}/picked_contigs.fa".format(key)
+            if os.path.exists(sf_tmp)==True:
+                cmd="cat {0} >> {1}".format(sf_tmp, sf_picked+"_ori.txt")
+                print cmd
+                Popen(cmd, shell = True, stdout = PIPE).communicate()

@@ -7,6 +7,9 @@ import json
 from Utility import *
 from run_multi_threads_collect_reads import *
 from merge_reads import *
+from assembleGaps import GapAssembler
+
+MERGE_FOLDER="merged/"
 
 def usage():
     print 'Usage: python {0} -c Options -g configure_file\n'.format(sys.argv[0]),
@@ -111,7 +114,32 @@ def prepare_sub_folders(spath):
     Popen(cmd, shell = True, stdout = PIPE).communicate()
 
 
+def prepare_sub_folders_merged(spath):
+    if os.path.exists("{0}/kmc_temp".format(spath))==True:
+        return
+    cmd="mkdir {0}/gap_reads".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+    cmd="mkdir {0}/gap_reads_for_alignment".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+    cmd="mkdir {0}/gap_reads_high_quality".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+
+    cmd="mkdir {0}/kmc_temp".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+    cmd="mkdir {0}/temp".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+    cmd="mkdir {0}/kmers".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+    cmd="mkdir {0}/velvet_temp".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+    cmd="mkdir {0}/both_unmapped".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+    cmd="mkdir {0}/unmapped_reads".format(spath)
+    Popen(cmd, shell = True, stdout = PIPE).communicate()
+
+
 def prepare_folders(algmt_list, working_space):
+    global MERGE_FOLDER
     #first prepare folders
     cnt=1
     folder_list=[]
@@ -126,9 +154,10 @@ def prepare_folders(algmt_list, working_space):
                 continue
             prepare_sub_folders(spath)
 
-    folder="merged" #prepare for the merged folder
-    #folder_list.append(folder)
+    #folder="merged" #prepare for the merged folder
+    folder=MERGE_FOLDER
     spath=working_space+folder
+    prepare_sub_folders_merged(spath)
     if os.path.exists(spath)==False:
         cmd="mkdir {0}".format(spath)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
@@ -199,33 +228,21 @@ def main_func(scommand, sf_config):
             drc.merge_dispatch_reads_for_gaps_v2(left_reads, right_reads)
             #dispatch_reads_for_gaps_to_validate_contigs(left_reads, right_reads)
             drc.dispatch_high_quality_reads_for_gaps(left_reads, right_reads)
-
             #####################################
 
         #then merge the reads
         rmerger=ReadsMerger()
-        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads", working_folder, nthreads)
-        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_alignment", working_folder, nthreads)
-        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_high_quality", working_folder, nthreads)
+        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads", working_folder+MMERGE_FOLDER, nthreads)
+        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_alignment", working_folder+MERGE_FOLDER, nthreads)
+        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_high_quality", working_folder+MERGE_FOLDER, nthreads)
 
         ##here remove the temporary files???? ##########################################################################
         for folder in folder_list:
             clean_all(folder)
 
     if scommand=="Assembly" or scommand=="All":
-        #still first prepare the folders
-        GAP_READS="gap_reads"
-        GAP_READS_ALIGNMENT="gap_reads_alignment"
-        GAP_READS_HIGH_QUALITY="gap_reads_high_quality"
-
-        KMC_DIR="kmc_temp"
-        TEMP_DIR="temp"
-        KMER_DIR="kmers"
-        VELVET_DIR="velvet_temp"
-        BOTH_UNMAPPED="both_unmapped"
-        UNMAPPED_READS="unmapped_reads"
-
-        #assemble for each gap
+        gap_assembler=GapAssembler(sf_fai, sf_gap_pos, nthreads, working_folder+MMERGE_FOLDER)
+        gap_assembler.assemble_pipeline()
 
     return
 
