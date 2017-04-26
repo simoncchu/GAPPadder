@@ -4,7 +4,7 @@ import user
 from Bio import SeqIO
 from subprocess import *
 
-class DG_processor:#process draft genome alignment
+class DGProcessor:#process draft genome alignment
     def __init__(self, ref_path, sf_pos):
         self.ref_path=ref_path
         self.sf_pos=sf_pos

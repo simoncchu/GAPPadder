@@ -2,12 +2,13 @@ import sys
 import os
 import argparse
 from subprocess import *
-from gnrt_pos_true_seqs import *
 import json
 from Utility import *
-from run_multi_threads_collect_reads import *
-from merge_reads import *
-from assembleGaps import GapAssembler
+from gnrt_pos_true_seqs import DGProcessor
+from run_multi_threads_collect_reads import MultiThrdReadsCollector
+from run_multi_threads_discordant import DiscordantReadsCollector
+from merge_reads import ReadsMerger
+from assemble_gaps import GapAssembler
 
 MERGE_FOLDER="merged/"
 
@@ -176,6 +177,7 @@ def clean_all(working_folder):
 
 
 def main_func(scommand, sf_config):
+    global MERGE_FOLDER
     brtn=parse_configuration(sf_config)
     if brtn==False:
         print "The required parameters are not set in the configuration file!!!"
@@ -201,7 +203,7 @@ def main_func(scommand, sf_config):
     if scommand=="Clean" or scommand=="All":
         clean_all(working_folder)
     if scommand=="Preprocess" or scommand=="All":
-        dgp=DG_processor(sf_draft, sf_gap_pos)
+        dgp=DGProcessor(sf_draft, sf_gap_pos)
         dgp.gnrt_gap_positions(min_gap_lenth, sf_gap_pos)
         dgp.get_gap_flank_seqs(sf_draft, sf_gap_pos, flank_length, sf_fai)
     if scommand=="Collect" or scommand=="All":
@@ -232,7 +234,7 @@ def main_func(scommand, sf_config):
 
         #then merge the reads
         rmerger=ReadsMerger()
-        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads", working_folder+MMERGE_FOLDER, nthreads)
+        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads", working_folder+MERGE_FOLDER, nthreads)
         rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_alignment", working_folder+MERGE_FOLDER, nthreads)
         rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_high_quality", working_folder+MERGE_FOLDER, nthreads)
 
@@ -241,14 +243,14 @@ def main_func(scommand, sf_config):
             clean_all(folder)
 
     if scommand=="Assembly" or scommand=="All":
-        gap_assembler=GapAssembler(sf_fai, sf_gap_pos, nthreads, working_folder+MMERGE_FOLDER)
+        gap_assembler=GapAssembler(sf_fai, sf_gap_pos, nthreads, working_folder+MERGE_FOLDER)
         gap_assembler.assemble_pipeline()
 
     return
 
 
 if __name__ == "__main__":
-    if len(sys.argv) <= 3:
+    if len(sys.argv) <= 2:
         usage()
         raise SystemExit
 
