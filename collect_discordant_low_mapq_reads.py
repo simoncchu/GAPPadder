@@ -28,10 +28,10 @@ def get_focal_region(sf_scaffod):
     return focal_region, m_pos_gaps
 
 
-def parse_discordant_reads_one_scaffold():
+def parse_discordant_reads_one_scaffold(working_folder):
     pre_ref=""
-    f_cluster_left=open("cluster_by_discordant_reads_left.list","w")
-    f_cluster_right=open("cluster_by_discordant_reads_right.list","w")
+    f_cluster_left=open(working_folder+"cluster_by_discordant_reads_left.list","w")
+    f_cluster_right=open(working_folder+"cluster_by_discordant_reads_right.list","w")
 
     focal_region={}
     m_pos_gaps={}
@@ -53,14 +53,14 @@ def parse_discordant_reads_one_scaffold():
             continue
 
         if pre_ref!=ref:
-            sf_scaffold="./discordant_temp/"+ref+".list"
+            sf_scaffold=working_folder+"discordant_temp/"+ref+".list"
             if os.path.exists(sf_scaffold)==False:
                 continue
             focal_region, m_pos_gaps=get_focal_region(sf_scaffold)
             f_cluster_left.close()
             f_cluster_right.close()
-            sf_cluster_left="discordant_reads_list/{0}_cluster_by_discordant_reads_left.list".format(ref)
-            sf_cluster_right="discordant_reads_list/{0}_cluster_by_discordant_reads_right.list".format(ref)
+            sf_cluster_left=working_folder+"discordant_reads_list/{0}_cluster_by_discordant_reads_left.list".format(ref)
+            sf_cluster_right=working_folder+"discordant_reads_list/{0}_cluster_by_discordant_reads_right.list".format(ref)
             f_cluster_left=open(sf_cluster_left,"w")
             f_cluster_right=open(sf_cluster_right,"w")
 
@@ -85,4 +85,5 @@ def parse_discordant_reads_one_scaffold():
 
 
 if __name__ == "__main__":
-    parse_discordant_reads_one_scaffold()
+    working_folder=sys.argv[1]
+    parse_discordant_reads_one_scaffold(working_folder)

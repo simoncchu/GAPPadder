@@ -10,6 +10,7 @@ from Utility import SAMTOOLS_PATH
 from Utility import get_samtools_path
 from Utility import REFINER_PATH
 from Utility import get_refiner_path
+from Utility import get_merger_path
 
 def remove_duplicate_contained(fcontig, foutput, cutoff, rm_contained):
     BWA_PATH=get_bwa_path()
@@ -69,7 +70,8 @@ def remove_duplicate_contained(fcontig, foutput, cutoff, rm_contained):
     Popen(cmd, shell = True, stdout = PIPE).communicate()
 
 
-def merge_contigs(contigs_merger_path, fout_folder, nthreads, cutoff_dup_bf_merge, cutoff_dup_af_merge):
+def merge_contigs(fout_folder, nthreads, cutoff_dup_bf_merge, cutoff_dup_af_merge):
+    contigs_merger_path=get_merger_path()
     fcontig=fout_folder+"contigs.fa"
     foutput=fcontig+"_no_dup.fa"
     remove_duplicate_contained(fcontig, foutput, cutoff_dup_bf_merge, False)
