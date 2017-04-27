@@ -18,7 +18,13 @@ The current released version of GAPPadder runs on Linux OS. And GAPPadder needs 
 
 - Python 2.7 or higher version is required to run GAPPadder. 
 - A k-mer counting tool. GAPPadder uses KMC program for performing k-mer counting. KMC can be downloaded from https://github.com/refresh-bio/KMC.
-- A reads assembler. GAPPadder uses Velvet at this point. In the future, we may support different assembler. Velvet can be downloaded from: https://www.ebi.ac.uk/~zerbino/velvet/. Caution: if you want to assemble k-mers that are longer than 30 bp, you need to recompile Velvet to let it work with longer sequence length. For example: **make MAXKMERLENGTH=60** , and this makes Velvet work for k-mer length up to 60. 
+- A reads assembler. GAPPadder uses Velvet at this point. In the future, we may support different assembler. Velvet can be downloaded from: https://www.ebi.ac.uk/~zerbino/velvet/. 
+Caution: if you want to assemble k-mers that are longer than 30 bp, you need to recompile Velvet to let it work with longer sequence length. 
+For example, use the follow command to recompile, while will make velvet work for k-mer length up to 60. 
+	```sh
+	$ make clean
+	$ make MAXKMERLENGTH=60
+	 ```
 - Reads mapping. GAPPadder uses bwa mem. BWA (version 0.7 or later) can be downloaded from https://github.com/lh3/bwa.
 - Sequence processing utilities. These include the commonly used samtools (v1.3.1 or later, note old version of samtools have different parameter setting with the latest one, now GAPPadder fully support the latest version (1.3.1) of samtools, but may fail when use older version). Our code also uses bamtools (https://github.com/pezmaster31/bamtools), but bamtools is not required to be installed.
 
@@ -53,7 +59,7 @@ The groups of paired end reads, with each pair one group.
 
 **alignments**
 
-The path of the alignment files. Should keep the same number as the group of PE reads.
+The path of the alignment files (must be sorted bam/cram files). Should keep the same number as the group of PE reads.
 
 **software_path**
 

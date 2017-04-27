@@ -170,10 +170,10 @@ class BothUnmappedReadsCollector():
                 continue
             ref_fields=fields[1].split(":")
             s_contig_fields=ref_fields[1].split("-")
-            if self.m_both_unmap_ref.has_key(s_contig_fields[0])==False:
-                self.m_both_unmap_ref[s_contig_fields[0]]={}
+            if m_both_unmap_ref.has_key(s_contig_fields[0])==False:
+                m_both_unmap_ref[s_contig_fields[0]]={}
                 fa_list_hit.append(s_contig_fields[0])
-            self.m_both_unmap_ref[s_contig_fields[0]][s_contig_fields[1]]=1
+            m_both_unmap_ref[s_contig_fields[0]][s_contig_fields[1]]=1
 
         pool1 = Pool(self.nthreads)
         pool1.map(run_alignment_unmapped_reads, fa_list_hit, 1)
@@ -234,4 +234,4 @@ class BothUnmappedReadsCollector():
         f_left.close()
         f_right.close()
 
-        self.align_unmapped_to_contigs(id_list, self.nthreads)
+        self.align_unmapped_to_contigs(id_list)

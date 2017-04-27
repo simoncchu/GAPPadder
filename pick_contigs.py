@@ -71,7 +71,7 @@ def run_pick_full_constructed_contig(id):
     global samtools_path
     global bwa_min_score
 
-    sf_flank=working_folder+"flank_regions/{0}.fa".format(id)
+    sf_flank=working_folder+"../flank_regions/{0}.fa".format(id)
     if os.path.exists(sf_flank)==False:
         print "Wrong flank regions: ", id
         return
@@ -560,7 +560,7 @@ class ContigsSelection():
         pool.join()
 
         #with open("picked_seqs_round0.fa","a") as fout_seqs:
-        #print fa_list ##########################################################################################################
+        #print fa_list #################################################################################################
         for key in fa_list:
             sf_tmp=working_folder+"velvet_temp/{0}/picked_seqs.fa".format(key)
             if os.path.exists(sf_tmp)==True:
