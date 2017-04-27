@@ -68,6 +68,9 @@ Show the path of the alignment files. Should keep the same number as the group o
 - nthreads: Number of threads.
 - verbose. If set to be 1, output more information about the current running states of GAPPadder.
 
+**kmer_length**
+
+Show the kmer lengths for assembly. For each k, there are several sub-k, which are the length of kmers going to be used by velvet.
 
 ## **Basic usage**
 
