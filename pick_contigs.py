@@ -580,7 +580,6 @@ class ContigsSelection():
                     l_picked[fields[0]+"_"+fields[1]]=1
         return l_picked
 
-
     def pick_extended_contigs(self, bwa_score, fa_list, sf_picked):
         global working_folder
         global bwa_min_score

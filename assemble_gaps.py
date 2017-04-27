@@ -78,27 +78,27 @@ def cvtFaToFq(sf_fa, sf_fq):
     fout.close()
     fin.close()
 
+
 def run_assembly(id):
     global kmer_len_list
     global working_folder
 
+    #print kmer_len_list
     for klen in kmer_len_list:
-        klen_fields=klen.split("_")
-        kmer_len=int(klen_fields[0])
-        asm_len=int(klen_fields[1])
+        kmer_len=int(klen[0])
+        asm_len=int(klen[1])
 
         pth=working_folder+"kmc_temp/{0}".format(id)
         if os.path.exists(pth)==False:
             cmd="mkdir {0}kmc_temp/{1}".format(working_folder,id)
-            #print cmd
             Popen(cmd, shell = True, stdout = PIPE).communicate()
 
         cmd="{0}kmc -k{1} -cs10000000 -m52 {2}gap_reads/{3}.fastq {4}temp/{5}.res {6}kmc_temp/{7}"\
-            .format(kmc_path, kmer_len,working_folder,id,working_folder,id,working_folder,id)
+            .format(kmc_path, kmer_len, working_folder, id, working_folder, id, working_folder, id)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
 
         cmd="{0}kmc_dump -ci0 {1}temp/{2}.res {3}temp/{4}.dump"\
-            .format(kmc_path, working_folder, id, working_folder,id)
+            .format(kmc_path, working_folder, id, working_folder, id)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
 
         sf_fa="{0}temp/{1}.dump".format(working_folder,id)
@@ -123,13 +123,14 @@ def run_assembly(id):
 
     sf_merged=working_folder+"velvet_temp/{0}/contigs.fa".format(id)
     with open(sf_merged,"w") as fout_merged:
-        for klen in l_kmer_len:
-            klen_fields=klen.split("_")
-            ctg=working_folder+"velvet_temp/{0}/contigs_{1}_{2}.fa".format(id, klen_fields[0], klen_fields[1])
+        for klen in kmer_len_list:
+            #klen_fields=klen.split("_")
+            sklen="{0}_{1}".format(klen[0], klen[1])
+            ctg=working_folder+"velvet_temp/{0}/contigs_{1}_{2}.fa".format(id, klen[0], klen[1])
             with open(ctg) as fin_ctg:
                 for line in fin_ctg:
                     if line[0]==">":
-                        fout_merged.write(">"+klen+"_"+line[1:])
+                        fout_merged.write(">"+sklen+"_"+line[1:])
                     else:
                         fout_merged.write(line)
     run_clear(id)
@@ -218,8 +219,8 @@ def run_collect_high_quality_unmap_to_contig_reads(id):
 
 class GapAssembler():
     def __init__(self, sf_fai, sf_pos, n_jobs, working_space):
-        global l_kmer_len
-        l_kmer_len=get_kmer_list()
+        global kmer_len_list
+        kmer_len_list=get_kmer_list()
         self.sf_fai=sf_fai
         self.sf_pos=sf_pos
         self.n_jobs=int(n_jobs)
