@@ -15,11 +15,11 @@ Refer to the paper for more detailed information.
 ## **Dependencies**
 The current released version of GAPPadder runs on Linux OS. And GAPPadder needs the following tools to be installed in the machine you are working on.
 
--Python 2.7 or higher version is required to run GAPPadder. 
--A k-mer counting tool. GAPPadder uses KMC program for performing k-mer counting. KMC can be downloaded from https://github.com/refresh-bio/KMC.
--A reads assembler. GAPPadder uses Velvet at this point. In the future, we may support different assembler. Velvet can be downloaded from: https://www.ebi.ac.uk/~zerbino/velvet/. Caution: if you want to assemble k-mers that are longer than 30 bp, you need to recompile Velvet to let it work with longer sequence length. For example: make MAXKMERLENGTH=60’. This makes Velvet work for k-mer length up to 60. 
--Reads mapping. GAPPadder uses bwa mem. BWA (version 0.7 or later) can be downloaded from https://github.com/lh3/bwa.
--Sequence processing utilities. These include the commonly used samtools (v1.3.1 or later, note old version of samtools have different parameter setting with the latest one, now GAPPadder fully support the latest version (1.3.1) of samtools, but may fail when use older version). Our code also uses bamtools (https://github.com/pezmaster31/bamtools), but bamtools is not required to be installed.
+- Python 2.7 or higher version is required to run GAPPadder. 
+- A k-mer counting tool. GAPPadder uses KMC program for performing k-mer counting. KMC can be downloaded from https://github.com/refresh-bio/KMC.
+- A reads assembler. GAPPadder uses Velvet at this point. In the future, we may support different assembler. Velvet can be downloaded from: https://www.ebi.ac.uk/~zerbino/velvet/. Caution: if you want to assemble k-mers that are longer than 30 bp, you need to recompile Velvet to let it work with longer sequence length. For example: make MAXKMERLENGTH=60’. This makes Velvet work for k-mer length up to 60. 
+- Reads mapping. GAPPadder uses bwa mem. BWA (version 0.7 or later) can be downloaded from https://github.com/lh3/bwa.
+- Sequence processing utilities. These include the commonly used samtools (v1.3.1 or later, note old version of samtools have different parameter setting with the latest one, now GAPPadder fully support the latest version (1.3.1) of samtools, but may fail when use older version). Our code also uses bamtools (https://github.com/pezmaster31/bamtools), but bamtools is not required to be installed.
 
 ## **Download and Install**
 First, download the whole folder from https://github.com/Reedwarbler/GAPPadder, including the subfolder TERefiner and ContigsMerger-v0.2.0.
@@ -68,6 +68,9 @@ Show the path of the alignment files. Should keep the same number as the group o
 - nthreads: Number of threads.
 - verbose. If set to be 1, output more information about the current running states of GAPPadder.
 
+**kmer_length**
+
+Show the kmer lengths for assembly. For each k, there are several sub-k, which are the length of kmers going to be used by velvet.
 
 ## **Basic usage**
 
