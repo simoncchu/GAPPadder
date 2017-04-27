@@ -13,7 +13,7 @@ class ReadsMerger():
         s_folder="{0}{1}".format(working_folder,reads_folder)
         if os.path.exists(s_folder)==False:
             cmd="mkdir {0}".format(s_folder)
-            self.run_cmd(cmd)
+            run_cmd_merger(cmd)
 
         m_scaffold_id={}
         cnt=0
