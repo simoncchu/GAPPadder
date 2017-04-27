@@ -27,7 +27,7 @@ class MultiThrdReadsCollector:
                 if m_scaffold_has_gap_list.has_key(fields[0])==False:
                     continue
 
-                cmd="{0}samtools view {1} \"{2}\" | python collect_reads_for_gaps.py {3} {4} {5} {6} {7} {8} -"\
+                cmd="{0} view {1} \"{2}\" | python collect_reads_for_gaps.py {3} {4} {5} {6} {7} {8} -"\
                     .format(samtools_path, self.sf_bam, fields[0], self.sf_gap_pos, self.anchor_mapq, working_folder,
                             insert_size, derivation, clip_dist)
                 cmd_list.append(cmd)

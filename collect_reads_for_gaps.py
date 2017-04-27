@@ -275,4 +275,4 @@ if __name__ == "__main__":
     if insert_size>=750:
         grc.parse_reads_fall_in_gaps_one_scaffold(sf_gap_pos, anchor_mapq, working_folder)
     else:
-        grc.parse_reads_fall_in_gaps_one_scaffold_short_is(self, sf_gap_pos, anchor_mapq, working_folder)
+        grc.parse_reads_fall_in_gaps_one_scaffold_short_is(sf_gap_pos, anchor_mapq, working_folder)

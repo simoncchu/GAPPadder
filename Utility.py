@@ -9,20 +9,12 @@ KMC_PATH=""
 VELVET_PATH=""
 THREADS=15
 OUTPUT_FOLDER="./GAPPadder_Output/"
-VERBOSE=True
+VERBOSE=0
 MIN_GAP_LENGTH=100
 FLANK_LENGTH=300
 KMER_LIST=[]
 
-def set_software_paths(pbwa,psamtools,prefiner, pmerger, pkmc,pvelvet):
-    if pbwa[-1]!="/":
-        pbwa=pbwa+"/"
-    if psamtools[-1]!="/":
-        psamtools=psamtools+"/"
-    if prefiner[-1]!="/":
-        prefiner=prefiner+"/"
-    if pmerger[-1]!="/":
-        pmerger=pmerger+"/"
+def set_software_paths(pbwa, psamtools, prefiner, pmerger, pkmc, pvelvet):
     if pkmc[-1]!="/":
         pkmc=pkmc+"/"
     if pvelvet[-1]!="/":
@@ -40,7 +32,7 @@ def set_software_paths(pbwa,psamtools,prefiner, pmerger, pkmc,pvelvet):
     global VELVET_PATH
     VELVET_PATH=pvelvet
 
-def set_parameters(pdraft, t, pout,vbs, min_gap_len, flank_len):
+def set_parameters(pdraft, t, pout, vbs, min_gap_len, flank_len):
     global DRAFT_GENOME
     DRAFT_GENOME=pdraft
     global THREADS

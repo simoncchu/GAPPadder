@@ -63,33 +63,40 @@ def parse_configuration(sf_config):
         ##alignment list
         for record in data["alignments"]:
             bam=record["bam"]
-            insert_size=record["is"]
-            std_derivation=record["std"]
+            insert_size=int(record["is"])
+            std_derivation=int(record["std"])
             lalgnmt.append((bam,insert_size,std_derivation))
-            rtn_msg="The bam file "+bam+" doesn't exist, please check!!!"
-            return rtn_msg, rtn_value
+            if os.path.exists(bam)==False:
+                rtn_msg="The bam file "+bam+" doesn't exist, please check!!!"
+                return rtn_msg, rtn_value
 
         ##optinal settings
         #parameters
         if "parameters" in data:
-            min_gap_len=data["parameters"]["min_gap_size"]
-            flank_len=data["parameters"]["flank_length"]
-            nthreads=data["parameters"]["nthreads"]
+            min_gap_len=int(data["parameters"]["min_gap_size"])
+            flank_len=int(data["parameters"]["flank_length"])
+            nthreads=int(data["parameters"]["nthreads"])
             working_folder=data["parameters"]["working_folder"]
-            vbs=data["parameters"]["verbose"]
+            if os.path.exists(working_folder)==False:
+                rtn_msg="The working folder provided doesn't exist, please check!!!"
+                return rtn_msg, rtn_value
+            vbs=int(data["parameters"]["verbose"])
 
         #raw reads
         for record in data["raw_reads"]:
             left_fq=record["left"]
             rigth_fq=record["right"]
+            if os.path.exists(left_fq)==False or os.path.exists(rigth_fq)==False:
+                rtn_msg="The raw reads files "+ left_fq+" or "+rigth_fq+" do not exist, please check!!!"
+                return rtn_msg, rtn_value
             lraw_reads.append((left_fq, rigth_fq))
 
         ##kmer list
         if "kmer_length" in data:
             for record in data["kmer_length"]:
-                k=record["k"]
+                k=int(record["k"])
                 for subrecord in record["k_velvet"]:
-                    sub_k=subrecord["k"]
+                    sub_k=int(subrecord["k"])
                     lkmers.append((k,sub_k))
 
         #software paths
@@ -99,51 +106,53 @@ def parse_configuration(sf_config):
             pvelvet=data["software_path"]["velvet"]
             prefiner=data["software_path"]["TERefiner"]
             pmerger=data["software_path"]["ContigsMerger"]
+            pkmc=data["software_path"]["kmc"]
 
     set_software_paths(pbwa, psamtools, prefiner, pmerger, pkmc, pvelvet)
     #print flank_len###############################################################################################
     set_parameters(sf_draft, nthreads, working_folder , vbs, min_gap_len, flank_len)
     set_alignment_list(lalgnmt)
+    set_raw_reads_list(lraw_reads)
     set_kmer_list(lkmers)
-    return True
+    return rtn_msg, True
 
 
 def prepare_sub_folders(spath):
-    cmd="mkdir {0}/scaffold_reads_list_all".format(spath)
+    cmd="mkdir {0}scaffold_reads_list_all".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/gap_reads".format(spath)
+    cmd="mkdir {0}gap_reads".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/gap_reads_for_alignment".format(spath)
+    cmd="mkdir {0}gap_reads_for_alignment".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/gap_reads_high_quality".format(spath)
+    cmd="mkdir {0}gap_reads_high_quality".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/discordant_reads_list".format(spath)
+    cmd="mkdir {0}discordant_reads_list".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/discordant_temp".format(spath)
+    cmd="mkdir {0}discordant_temp".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
 
 
 def prepare_sub_folders_merged(spath):
-    if os.path.exists("{0}/kmc_temp".format(spath))==True:
+    if os.path.exists("{0}kmc_temp".format(spath))==True:
         return
-    cmd="mkdir {0}/gap_reads".format(spath)
+    cmd="mkdir {0}gap_reads".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/gap_reads_for_alignment".format(spath)
+    cmd="mkdir {0}gap_reads_for_alignment".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/gap_reads_high_quality".format(spath)
+    cmd="mkdir {0}gap_reads_high_quality".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
 
-    cmd="mkdir {0}/kmc_temp".format(spath)
+    cmd="mkdir {0}kmc_temp".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/temp".format(spath)
+    cmd="mkdir {0}temp".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/kmers".format(spath)
+    cmd="mkdir {0}kmers".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/velvet_temp".format(spath)
+    cmd="mkdir {0}velvet_temp".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/both_unmapped".format(spath)
+    cmd="mkdir {0}both_unmapped".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
-    cmd="mkdir {0}/unmapped_reads".format(spath)
+    cmd="mkdir {0}unmapped_reads".format(spath)
     Popen(cmd, shell = True, stdout = PIPE).communicate()
 
 
@@ -153,30 +162,30 @@ def prepare_folders(algmt_list, working_space):
     cnt=1
     folder_list=[]
     for algmt in algmt_list:
-        folder="{0}_is{1}".format(cnt, algmt[1])
-        folder_list.append(folder)
+        folder="{0}_is{1}/".format(cnt, algmt[1])
         spath=working_space+folder
+        folder_list.append(spath)
+        cnt=cnt+1
         if os.path.exists(spath)==False:
             cmd="mkdir {0}".format(spath)
             Popen(cmd, shell = True, stdout = PIPE).communicate()
-            if os.path.exists("{0}/scaffold_reads_list_all".format(spath)):
+            if os.path.exists("{0}scaffold_reads_list_all".format(spath)):
                 continue
             prepare_sub_folders(spath)
 
     #folder="merged" #prepare for the merged folder
     folder=MERGE_FOLDER
     spath=working_space+folder
-    prepare_sub_folders_merged(spath)
     if os.path.exists(spath)==False:
         cmd="mkdir {0}".format(spath)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
-        if os.path.exists("{0}/scaffold_reads_list_all".format(spath))==False:
-            prepare_sub_folders(spath)
+        if os.path.exists("{0}scaffold_reads_list_all".format(spath))==False:
+            prepare_sub_folders_merged(spath)
     return folder_list
 
 def clean_all(working_folder):
     empty_folder="empty_dir"
-    if os.path.exists(empty_folder):
+    if os.path.exists(empty_folder)==False:
         cmd="mkdir {0}".format(empty_folder)
         Popen(cmd, shell = True, stdout = PIPE).communicate()
 
@@ -186,9 +195,9 @@ def clean_all(working_folder):
 
 def main_func(scommand, sf_config):
     global MERGE_FOLDER
-    brtn=parse_configuration(sf_config)
+    rtn_msg, brtn=parse_configuration(sf_config)
     if brtn==False:
-        print "The required parameters are not set in the configuration file!!!"
+        print rtn_msg
         return
 
     min_gap_lenth=get_min_gap_length()
@@ -212,24 +221,34 @@ def main_func(scommand, sf_config):
         clean_all(working_folder)
     if scommand=="Preprocess" or scommand=="All":
         dgp=DGProcessor(sf_draft, sf_gap_pos)
-        dgp.gnrt_gap_positions(min_gap_lenth, sf_gap_pos)
-        dgp.get_gap_flank_seqs(sf_draft, sf_gap_pos, flank_length, sf_fai)
+        dgp.gnrt_gap_positions(min_gap_lenth)
+        dgp.get_gap_flank_seqs(sf_draft, sf_gap_pos, flank_length, sf_fai, working_folder)
     if scommand=="Collect" or scommand=="All":
         folder_list=prepare_folders(algmt_list, working_folder)#first collect reads for each alignment
         raw_reads_list=get_raw_reads_list()
-        for algmt, folder, raw_reads in algmt_list, folder_list, raw_reads_list:
+        #print len(algmt_list), len(folder_list), len(raw_reads_list)
+        if len(algmt_list)!=len(raw_reads_list) and len(folder_list)!=len(raw_reads_list):
+            print "# of alignment files and # of raw reads do not match!!!!!"
+            return
+
+        idx=0
+        for algmt in algmt_list:#
+            folder=folder_list[idx]
+            raw_reads=raw_reads_list[idx]
+            idx=idx+1
+
             sf_bam=algmt[0]
             insert_size=algmt[1]
             derivation=algmt[2]
-            mtrc=MultiThrdReadsCollector(sf_fai, sf_bam, sf_gap_pos, anchor_mapq)
-            mtrc.dispath_collect_jobs(nthreads, samtools_path, insert_size, derivation, clip_dist, folder)
+            #mtrc=MultiThrdReadsCollector(sf_fai, sf_bam, sf_gap_pos, anchor_mapq)
+            #mtrc.dispath_collect_jobs(nthreads, samtools_path, insert_size, derivation, clip_dist, folder)
 
             ##run reads collect for discordant
             left_reads=raw_reads[0]
             right_reads=raw_reads[1]
             if folder[-1]!="/":
                 folder=folder+"/"
-            sfout_discord_pos=folder+"discordant_reads_list"
+            sfout_discord_pos=folder+"discordant_reads_pos.txt"
 
             drc=DiscordantReadsCollector(sf_fai, sf_bam, folder, nthreads)
             drc.collect_discordant_regions_v2(sfout_discord_pos)
@@ -241,14 +260,14 @@ def main_func(scommand, sf_config):
             #####################################
 
         #then merge the reads
-        rmerger=ReadsMerger()
-        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads", working_folder+MERGE_FOLDER, nthreads)
-        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_alignment", working_folder+MERGE_FOLDER, nthreads)
-        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_high_quality", working_folder+MERGE_FOLDER, nthreads)
-
-        ##here remove the temporary files???? ##########################################################################
-        for folder in folder_list:
-            clean_all(folder)
+        # rmerger=ReadsMerger()
+        # rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads", working_folder+MERGE_FOLDER, nthreads)
+        # rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_alignment", working_folder+MERGE_FOLDER, nthreads)
+        # rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_high_quality", working_folder+MERGE_FOLDER, nthreads)
+        #
+        # ##here remove the temporary files???? ##########################################################################
+        # for folder in folder_list:
+        #     clean_all(folder)
 
     if scommand=="Assembly" or scommand=="All":
         gap_assembler=GapAssembler(sf_fai, sf_gap_pos, nthreads, working_folder+MERGE_FOLDER)

@@ -50,14 +50,13 @@ class DGProcessor:#process draft genome alignment
                     if min_pos==-1:
                         break
 
-                    #print start, min_pos, min_pos-start, str(record.id)
-                    if (min_pos-start) >= min_gap_lenth:
+                    if ((min_pos-start) >= min_gap_lenth):
                         str1="{0} {1} {2} {3}\n".format(start, min_pos, min_pos-start, str(record.id))
                         fout_pos.write(str1)
                     pos=min_pos+2
 
 
-    def get_gap_flank_seqs(self, ref_path, sf_gap_pos, frame_length, sf_fai):
+    def get_gap_flank_seqs(self, ref_path, sf_gap_pos, frame_length, sf_fai, working_folder):
         m_scaffold_id={}
         l_scaffold_id=[]
         cnt=0##scaffold id, started from 0
@@ -82,8 +81,12 @@ class DGProcessor:#process draft genome alignment
 
                     cnt=m_scaffold_id[scf_id]
                     gap_id="{0}_{1}".format(cnt,num)
-                    sf_flank="flank_regions/{0}.fa".format(gap_id)
+                    sf_flank_folder=working_folder+"flank_regions"
+                    if os.path.exists(sf_flank_folder)==False:
+                        cmd="mkdir {0}".format(sf_flank_folder)
+                        Popen(cmd, shell = True, stdout = PIPE).communicate()
 
+                    sf_flank=working_folder+"flank_regions/{0}.fa".format(gap_id)
                     with open(sf_flank,"w") as fout_flank:
                         start=int(fields[0])
                         end=int(fields[1])
@@ -95,8 +98,6 @@ class DGProcessor:#process draft genome alignment
                         fout_flank.write(">"+gap_id+"_right\n")
                         fout_flank.write(str(seq1[end+5:end+frame_length])+"\n")
                         num=num+1
-
-
 
     def is_qualified_clipped(self, cigar, cutoff_len):
         l=len(cigar)
@@ -204,17 +205,3 @@ class DGProcessor:#process draft genome alignment
                             continue
                         fout_new.write(">"+str(record.id)+"\n")
                         fout_new.write(str(record.seq)[389:seq_len-105])
-
-
-# ref_path=sys.argv[1]
-# sf_gap_pos=sys.argv[2]
-# # sf_sam=sys.argv[2]
-# flank_length=int(sys.argv[3])
-# sf_fai=sys.argv[4]
-# #
-# bg=DG_processor(ref_path,sf_gap_pos)
-#
-# # #gnrt_gap_positions(ref_path,sf_gap_pos)
-# bg.get_gap_flank_seqs(ref_path, sf_gap_pos, flank_length, sf_fai)
-# # gnrt_gap_seqs(sf_sam, ref_path, flank_length)
-# # #rm_bias(sys.argv[1])

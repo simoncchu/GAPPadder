@@ -71,7 +71,7 @@ def run_pick_full_constructed_contig(id):
     global samtools_path
     global bwa_min_score
 
-    sf_flank=working_folder+"../flank_regions/{0}.fa".format(id)
+    sf_flank=working_folder+"flank_regions/{0}.fa".format(id)
     if os.path.exists(sf_flank)==False:
         print "Wrong flank regions: ", id
         return
