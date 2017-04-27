@@ -38,13 +38,17 @@ GAPPadder needs a configuration file in JSON format. The configuration file tell
 Once finish the configuration file, users can use this website (http://jsonlint.com/) to check whether there are errors. 
 
 Here, we give an explanation on the parameters.
+
 **draft_genome**
+
 Show the path of the draft genome
 
 **raw_reads**
+
 Show the groups of paired end reads, with each pair one group.
 
 **alignments**
+
 Show the path of the alignment files. Should keep the same number as the group of PE reads.
 
 **software_path**
@@ -88,7 +92,6 @@ $ python ./main.py -c Clean -g configuration-file-name
 ```
 
 ## **Ouptput**
-Two main output:
 
 picked_seqs.fa contains the selected fully closed and extended gap sequences.
  
