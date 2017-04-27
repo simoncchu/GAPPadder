@@ -37,7 +37,6 @@ $ chmod +x ./TERefiner_1  &&  chmod +x ./ContigsMerger
 
 GAPPadder needs a configuration file in JSON format. The configuration file tells GAPPadder the basic settings. Users can find one sample from the same folder in this github cite.
 Once finish the configuration file, users can use this website (http://jsonlint.com/) to check whether there are errors. 
-
 Here, we give an explanation on the parameters.
 
 **draft_genome**

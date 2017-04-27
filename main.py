@@ -250,20 +250,20 @@ def main_func(scommand, sf_config):
                 folder=folder+"/"
             sfout_discord_pos=folder+"discordant_reads_pos.txt"
 
-            drc=DiscordantReadsCollector(sf_fai, sf_bam, folder, nthreads)
-            drc.collect_discordant_regions_v2(sfout_discord_pos)
-            drc.dispath_collect_jobs()
-
-            drc.merge_dispatch_reads_for_gaps_v2(left_reads, right_reads)
-            #dispatch_reads_for_gaps_to_validate_contigs(left_reads, right_reads)
-            drc.dispatch_high_quality_reads_for_gaps(left_reads, right_reads)
+            # drc=DiscordantReadsCollector(sf_fai, sf_bam, folder, nthreads)
+            # drc.collect_discordant_regions_v2(sfout_discord_pos)
+            # drc.dispath_collect_jobs()
+            #
+            # drc.merge_dispatch_reads_for_gaps_v2(left_reads, right_reads)
+            # #dispatch_reads_for_gaps_to_validate_contigs(left_reads, right_reads)
+            # drc.dispatch_high_quality_reads_for_gaps(left_reads, right_reads)
             #####################################
 
         #then merge the reads
-        # rmerger=ReadsMerger()
-        # rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads", working_folder+MERGE_FOLDER, nthreads)
-        # rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_alignment", working_folder+MERGE_FOLDER, nthreads)
-        # rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_high_quality", working_folder+MERGE_FOLDER, nthreads)
+        rmerger=ReadsMerger()
+        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads", working_folder+MERGE_FOLDER, nthreads)
+        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_alignment", working_folder+MERGE_FOLDER, nthreads)
+        rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_high_quality", working_folder+MERGE_FOLDER, nthreads)
         #
         # ##here remove the temporary files???? ##########################################################################
         # for folder in folder_list:
