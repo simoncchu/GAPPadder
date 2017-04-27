@@ -58,39 +58,37 @@ Show the path of the alignment files. Should keep the same number as the group o
 
 **parameters**
 
--working_folder : Where to output the results.
--min_gap_size: Minimum gap size the tool focues on.
--flank_length: Length of the left and right flank regions.
--nthreads: Number of threads.
--verbose. If set to be 1, output more information about the current running states of GAPPadder.
+- working_folder : Where to output the results.
+- min_gap_size: Minimum gap size the tool focues on.
+- flank_length: Length of the left and right flank regions.
+- nthreads: Number of threads.
+- verbose. If set to be 1, output more information about the current running states of GAPPadder.
 
 
 ## **Basic usage**
 
 Preprocess the draft genome to get the gap positions and flank regions:
 ```sh
-$python ./main.py -c Preprocess -g configuration-file-name 
+$ python ./main.py -c Preprocess -g configuration-file-name 
 ```
 
 Collect reads for each gap:
 ```sh
-$python ./main.py -c Collect -g configuration-file-name 
+$ python ./main.py -c Collect -g configuration-file-name 
 ```
 
 Construct the gap sequence and pick the best one:
 ```sh
-python ./main.py -c Assembly -g configuration-file-name
+$ python ./main.py -c Assembly -g configuration-file-name
 ```
 
 Clean the old data:
 ```sh
-python ./main.py -c Clean -g configuration-file-name
+$ python ./main.py -c Clean -g configuration-file-name
 ```
 
 ## **Ouptput**
 Two main output:
 
-contigs.fa which contains the constructed repeats.
-
-X_contig_pairs_info.txt_cov_info_with_cutoff.txt contains the repeat coverage information. 
-There are 3 columns for each line: Repeat-Id, Repeat-Length, Repeat-Average-coverage. 
+picked_seqs.fa contains the selected fully closed and extended gap sequences.
+ 

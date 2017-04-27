@@ -49,42 +49,42 @@ Show the path of the alignment files. Should keep the same number as the group o
 
 **software_path**
 
--kmc: Set to the folder of KMC executable. If already added the PATH, then use "" in this field.
--velvet: Set to the folder of Velvet executable. If already added the PATH, then use "" in this field.
--bwa: Set to the path of BWA executable. If already added the PATH, then use "bwa" in this field.
--samtools: Set to the path of samtools executable. If already added the PATH, then use "samtools" in this field.
--TERefiner: set to the path of TERefiner_1 executable. If put at the same folder as main.py, then keep the same as the sample configuration file.
--ContigsMerger: set to the path of ContigsMerger executable. If put at the same folder as main.py, then keep the same as the sample configuration file.
+- kmc: Set to the folder of KMC executable. If already added the PATH, then use "" in this field.
+- velvet: Set to the folder of Velvet executable. If already added the PATH, then use "" in this field.
+- bwa: Set to the path of BWA executable. If already added the PATH, then use "bwa" in this field.
+- samtools: Set to the path of samtools executable. If already added the PATH, then use "samtools" in this field.
+- TERefiner: set to the path of TERefiner_1 executable. If put at the same folder as main.py, then keep the same as the sample configuration file.
+- ContigsMerger: set to the path of ContigsMerger executable. If put at the same folder as main.py, then keep the same as the sample configuration file.
 
 **parameters**
 
--working_folder : Where to output the results.
--min_gap_size: Minimum gap size the tool focues on.
--flank_length: Length of the left and right flank regions.
--nthreads: Number of threads.
--verbose. If set to be 1, output more information about the current running states of GAPPadder.
+- working_folder : Where to output the results.
+- min_gap_size: Minimum gap size the tool focues on.
+- flank_length: Length of the left and right flank regions.
+- nthreads: Number of threads.
+- verbose. If set to be 1, output more information about the current running states of GAPPadder.
 
 
 ## **Basic usage**
 
 Preprocess the draft genome to get the gap positions and flank regions:
 ```sh
-$python ./main.py -c Preprocess -g configuration-file-name 
+$ python ./main.py -c Preprocess -g configuration-file-name 
 ```
 
 Collect reads for each gap:
 ```sh
-$python ./main.py -c Collect -g configuration-file-name 
+$ python ./main.py -c Collect -g configuration-file-name 
 ```
 
 Construct the gap sequence and pick the best one:
 ```sh
-python ./main.py -c Assembly -g configuration-file-name
+$ python ./main.py -c Assembly -g configuration-file-name
 ```
 
 Clean the old data:
 ```sh
-python ./main.py -c Clean -g configuration-file-name
+$ python ./main.py -c Clean -g configuration-file-name
 ```
 
 ## **Ouptput**
