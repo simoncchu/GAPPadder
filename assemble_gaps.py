@@ -255,7 +255,7 @@ class GapAssembler():
         cnt=1
         pre_id=0
 
-        with open(self.sf_gap_pos) as fin_gap_pos:#for each gap
+        with open(self.sf_pos) as fin_gap_pos:#for each gap
             for line in fin_gap_pos:
                 fields=line.split()
                 scaffold=fields[3]
@@ -331,39 +331,39 @@ class GapAssembler():
         fa_list=self.prepare_list()
         print "First round assembly and merger..."
         self.assembly(fa_list)
-        self.run_contigs_merge(fa_list)
-
-        sf_picked=working_folder+"picked_seqs.fa"
-        bwa_min_score=30
-        contigs_select=ContigsSelection(working_folder)
-
-        id_remain=self.pick_already_constructed(contigs_select, bwa_min_score, fa_list, sf_picked)
-        algnmt_list=get_alignment_list()
-        bam_list=[]
-        for algnmt in algnmt_list:
-            bam_list.append(algnmt[0])
-
-        print "Collect both unmapped reads..."
-        burc=BothUnmappedReadsCollector(working_folder)
-        burc.collect_both_unmapped_reads(bam_list, id_remain)
-
-        print "Second round assembly..."
-        self.assembly_given_list(id_remain)
-        id_remain2=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain, sf_picked)
-
-        print "Second round merging..."
-        self.run_contigs_merge(id_remain2)
-        id_remain3=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain2, sf_picked)
-
-        print "Collecting high quality reads to improve the merging step..."
-        self.collect_high_quality_unmap_to_contigs_reads(id_remain3)
-        self.run_contigs_merge(id_remain3)
-
-        # # # # # #
-        print "Pick extended gap sequences..."
-        bwa_min_score=15
-        id_remain4=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain3, sf_picked)
-        contigs_select.pick_extended_contigs(bwa_min_score, id_remain4, sf_picked)
+        # self.run_contigs_merge(fa_list)
+        #
+        # sf_picked=working_folder+"picked_seqs.fa"
+        # bwa_min_score=30
+        # contigs_select=ContigsSelection(working_folder)
+        #
+        # id_remain=self.pick_already_constructed(contigs_select, bwa_min_score, fa_list, sf_picked)
+        # algnmt_list=get_alignment_list()
+        # bam_list=[]
+        # for algnmt in algnmt_list:
+        #     bam_list.append(algnmt[0])
+        #
+        # print "Collect both unmapped reads..."
+        # burc=BothUnmappedReadsCollector(working_folder)
+        # burc.collect_both_unmapped_reads(bam_list, id_remain)
+        #
+        # print "Second round assembly..."
+        # self.assembly_given_list(id_remain)
+        # id_remain2=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain, sf_picked)
+        #
+        # print "Second round merging..."
+        # self.run_contigs_merge(id_remain2)
+        # id_remain3=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain2, sf_picked)
+        #
+        # print "Collecting high quality reads to improve the merging step..."
+        # self.collect_high_quality_unmap_to_contigs_reads(id_remain3)
+        # self.run_contigs_merge(id_remain3)
+        #
+        # # # # # # #
+        # print "Pick extended gap sequences..."
+        # bwa_min_score=15
+        # id_remain4=self.pick_already_constructed(contigs_select, bwa_min_score, id_remain3, sf_picked)
+        # contigs_select.pick_extended_contigs(bwa_min_score, id_remain4, sf_picked)
 
 # def run_filter(id):
 #     fcontig="velvet_temp/"+id+"/contigs.fa"

@@ -25,8 +25,12 @@ The current released version of GAPPadder runs on Linux OS. And GAPPadder needs 
 ## **Download and Install**
 First, download the whole folder from https://github.com/Reedwarbler/GAPPadder, including the subfolder TERefiner and ContigsMerger-v0.2.0.
 
-By default, users can directly run the tool and there is no need to install if you have all the dependencies installed. However, on some machines users may fail to run the pre-compiled tools TERefiner_1 and ContigsMerger, then users need to compile by themselves and run the follow commands:
+By default, users can directly run the tool and there is no need to install if you have all the dependencies installed. Before run, need to run the following command:
+```sh
+$ chmod +x ./TERefiner_1  &&  chmod +x ./ContigsMerger 
+```
 
+However, on some machines users may fail to run the pre-compiled tools TERefiner_1 and ContigsMerger, then users need to compile by themselves (Note, TERefiner needs bamtools to compile, and users need to set the bamtools path in the makefile) and run the follow commands:
 ```sh
 $ cd TERefiner  &&  make  &&  cd .. 
 $ cd ./ContigsCompactor-v0.2.0/ContigsMerger/  &&  make  &&  cd .. 

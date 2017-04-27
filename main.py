@@ -240,8 +240,8 @@ def main_func(scommand, sf_config):
             sf_bam=algmt[0]
             insert_size=algmt[1]
             derivation=algmt[2]
-            #mtrc=MultiThrdReadsCollector(sf_fai, sf_bam, sf_gap_pos, anchor_mapq)
-            #mtrc.dispath_collect_jobs(nthreads, samtools_path, insert_size, derivation, clip_dist, folder)
+            mtrc=MultiThrdReadsCollector(sf_fai, sf_bam, sf_gap_pos, anchor_mapq)
+            mtrc.dispath_collect_jobs(nthreads, samtools_path, insert_size, derivation, clip_dist, folder)
 
             ##run reads collect for discordant
             left_reads=raw_reads[0]
@@ -250,13 +250,13 @@ def main_func(scommand, sf_config):
                 folder=folder+"/"
             sfout_discord_pos=folder+"discordant_reads_pos.txt"
 
-            # drc=DiscordantReadsCollector(sf_fai, sf_bam, folder, nthreads)
-            # drc.collect_discordant_regions_v2(sfout_discord_pos)
-            # drc.dispath_collect_jobs()
-            #
-            # drc.merge_dispatch_reads_for_gaps_v2(left_reads, right_reads)
-            # #dispatch_reads_for_gaps_to_validate_contigs(left_reads, right_reads)
-            # drc.dispatch_high_quality_reads_for_gaps(left_reads, right_reads)
+            drc=DiscordantReadsCollector(sf_fai, sf_bam, folder, nthreads)
+            drc.collect_discordant_regions_v2(sfout_discord_pos)
+            drc.dispath_collect_jobs()
+
+            drc.merge_dispatch_reads_for_gaps_v2(left_reads, right_reads)
+            #dispatch_reads_for_gaps_to_validate_contigs(left_reads, right_reads)
+            drc.dispatch_high_quality_reads_for_gaps(left_reads, right_reads)
             #####################################
 
         #then merge the reads
@@ -272,7 +272,6 @@ def main_func(scommand, sf_config):
     if scommand=="Assembly" or scommand=="All":
         gap_assembler=GapAssembler(sf_fai, sf_gap_pos, nthreads, working_folder+MERGE_FOLDER)
         gap_assembler.assemble_pipeline()
-
     return
 
 
@@ -280,6 +279,5 @@ if __name__ == "__main__":
     if len(sys.argv) <= 2:
         usage()
         raise SystemExit
-
     sfconfig, scommand = get_args()
     main_func(scommand,sfconfig)
