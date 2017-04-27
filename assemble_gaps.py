@@ -332,7 +332,7 @@ class GapAssembler():
         self.assembly(fa_list)
         self.run_contigs_merge(fa_list)
         #
-        sf_picked=working_folder+"picked_seqs.fa"
+        sf_picked=working_folder+"../picked_seqs.fa"
         bwa_min_score=30
         contigs_select=ContigsSelection(working_folder)
         contigs_select.pick_full_constructed_contigs(bwa_min_score, fa_list, sf_picked)
