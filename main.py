@@ -266,8 +266,8 @@ def main_func(scommand, sf_config):
         rmerger.merge_reads_v2(sf_fai, sf_gap_pos, folder_list, "gap_reads_high_quality", working_folder+MERGE_FOLDER, nthreads)
         #
         # ##here remove the temporary files???? ##########################################################################
-        # for folder in folder_list:
-        #     clean_all(folder)
+        for folder in folder_list:
+            clean_all(folder)
 
     if scommand=="Assembly" or scommand=="All":
         gap_assembler=GapAssembler(sf_fai, sf_gap_pos, nthreads, working_folder+MERGE_FOLDER)

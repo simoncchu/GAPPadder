@@ -16,7 +16,7 @@ The main advantages of GAPPadder is that (Refer to the paper for more detailed i
 ## **Dependencies**
 The current released version of GAPPadder runs on Linux OS. And GAPPadder needs the following tools to be installed in the machine you are working on.
 
-- Python 2.7 or higher version is required to run GAPPadder. 
+- Python 2.7 or higher version is required to run GAPPadder. Also need the Biopython package (http://biopython.org/wiki/Download) to be installed. 
 - A k-mer counting tool. GAPPadder uses KMC program for performing k-mer counting. KMC can be downloaded from https://github.com/refresh-bio/KMC.
 - A reads assembler. GAPPadder uses Velvet at this point. In the future, we may support different assembler. Velvet can be downloaded from: https://www.ebi.ac.uk/~zerbino/velvet/. 
 Caution: if you want to assemble k-mers that are longer than 30 bp, you need to recompile Velvet to let it work with longer sequence length. 
