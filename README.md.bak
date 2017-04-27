@@ -8,9 +8,10 @@ Chong Chu, Xin Li, and Yufeng Wu. "GAPPadder: A Sensitive Approach for Closing G
 
 ## **Functionalities and Usage of GAPPadder**
 GAPPadder is designed for closing gaps on the draft genomes with paired-end reads or mate-paired reads. 
-The main advantages of GAPPadder is that: 1) It collects more reads, especially the repeats associated reads, to close the gaps. 
-2) It performs a two stage local assembly to construct the gap sequences. 3) It fully utilize the different insert size PE or MP reads. 
-Refer to the paper for more detailed information. 
+The main advantages of GAPPadder is that (Refer to the paper for more detailed information): 
+- It collects more reads, especially the repeats associated reads, to close the gaps. 
+- It performs a two stage local assembly to construct the gap sequences. 
+- It fully utilize the different insert size PE or MP reads. 
 
 ## **Dependencies**
 The current released version of GAPPadder runs on Linux OS. And GAPPadder needs the following tools to be installed in the machine you are working on.
