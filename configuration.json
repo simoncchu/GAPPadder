@@ -33,7 +33,7 @@
         "ContigsMerger": "./ContigsMerger"
     },
     "parameters": {
-    		"working_folder": "/gpfs/scratchfs1/chc12015/GAPdenovo/test/chrm14_test/",
+    		"working_folder": "/gpfs/scratchfs1/chc12015/GAPdenovo/test/chrm14_test1/",
         "min_gap_size": "100",
         "flank_length": "300",
         "nthreads": "15",
@@ -56,5 +56,14 @@
 						{
 								"k": 37
 						}]
-		}]
+				},
+				{
+						"k": 50,
+						"k_velvet": [{
+								"k": 49
+						}, 
+						{
+								"k": 47
+						}]
+				}]
 }

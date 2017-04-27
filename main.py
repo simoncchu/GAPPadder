@@ -78,7 +78,7 @@ def parse_configuration(sf_config):
             nthreads=int(data["parameters"]["nthreads"])
             working_folder=data["parameters"]["working_folder"]
             if os.path.exists(working_folder)==False:
-                rtn_msg="The working folder provided doesn't exist, please check!!!"
+                rtn_msg="The working(output) folder provided doesn't exist, please check!!!"
                 return rtn_msg, rtn_value
             vbs=int(data["parameters"]["verbose"])
 
