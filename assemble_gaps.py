@@ -331,8 +331,8 @@ class GapAssembler():
         global working_folder
         fa_list=self.prepare_list()
         print "First round assembly and merger..."
-        self.assembly(fa_list)
-        # self.run_contigs_merge(fa_list)
+        #self.assembly(fa_list)
+        self.run_contigs_merge(fa_list)
         #
         # sf_picked=working_folder+"picked_seqs.fa"
         # bwa_min_score=30

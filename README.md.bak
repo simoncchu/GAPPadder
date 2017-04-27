@@ -30,7 +30,7 @@ By default, users can directly run the tool and there is no need to install if y
 $ chmod +x ./TERefiner_1  &&  chmod +x ./ContigsMerger 
 ```
 
-However, on some machines users may fail to run the pre-compiled tools TERefiner_1 and ContigsMerger, then users need to compile by themselves and run the follow commands:
+However, on some machines users may fail to run the pre-compiled tools TERefiner_1 and ContigsMerger, then users need to compile by themselves (Note, TERefiner needs bamtools to compile, and users need to set the bamtools path in the makefile) and run the follow commands:
 ```sh
 $ cd TERefiner  &&  make  &&  cd .. 
 $ cd ./ContigsCompactor-v0.2.0/ContigsMerger/  &&  make  &&  cd .. 
@@ -45,15 +45,15 @@ Here, we give an explanation on the parameters.
 
 **draft_genome**
 
-Show the path of the draft genome
+The path of the draft genome
 
 **raw_reads**
 
-Show the groups of paired end reads, with each pair one group.
+The groups of paired end reads, with each pair one group.
 
 **alignments**
 
-Show the path of the alignment files. Should keep the same number as the group of PE reads.
+The path of the alignment files. Should keep the same number as the group of PE reads.
 
 **software_path**
 
@@ -74,7 +74,7 @@ Show the path of the alignment files. Should keep the same number as the group o
 
 **kmer_length**
 
-Show the kmer lengths for assembly. For each k, there are several sub-k, which are the length of kmers going to be used by velvet.
+The kmer lengths for assembly. For each k, there are several sub-k, which are the length of kmers going to be used by velvet.
 
 ## **Basic usage**
 
