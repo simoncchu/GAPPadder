@@ -972,7 +972,7 @@ cout << endl;
 
     }
     
-printf("Time taken for retrieving path: %.2fs\n", (double)(clock() - tStart_path) / CLOCKS_PER_SEC);
+//printf("Time taken for retrieving path: %.2fs\n", (double)(clock() - tStart_path) / CLOCKS_PER_SEC);
 
     // cleanup
     for(int i=0; i<(int)listRevCompContigs.size(); ++i)
